@@ -9,9 +9,11 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 func main() {
+	start := time.Now()
 	var read string
 	fmt.Scanf("%s", &read)
 	fmt.Println(read)
@@ -21,6 +23,8 @@ func main() {
 	b := get(_url)
 	zipHttp("master.zip", b)
 	unZip("master.zip")
+	end := time.Now()
+	fmt.Printf("cost time:%v\n", end.Sub(start))
 }
 
 func githubBranch(branch string) string {
