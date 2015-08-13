@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/everfore/codeload/code"
-	"github.com/everfore/codeload/unzip"
+	// "github.com/everfore/codeload/unzip"
 )
 
 func main() {
@@ -13,21 +14,17 @@ func main() {
 	tips := "everfore/codeload:master  > "
 	fmt.Print(tips)
 	fmt.Scanf("%s", &input)
-	fmt.Println(input)
 
 	start := time.Now()
 
-	codeuri := code.GithubCodeURI(input)
-	codeuri.Download()
-	codeuri.Unzip()
-
-	fmt.Printf("cost time:%v\n", time.Now().Sub(start))
-}
-
-func v1_2() {
-	start := time.Now()
-
-	unzip.Unzip("master.zip")
+	if strings.Contains(input, "/") {
+		codeuri := code.GithubCodeURI(input)
+		codeuri.Download()
+		codeuri.Unzip()
+	} else {
+		codeuri := code.GithubCodeURI("/" + input)
+		codeuri.Unzip()
+	}
 
 	fmt.Printf("cost time:%v\n", time.Now().Sub(start))
 }
