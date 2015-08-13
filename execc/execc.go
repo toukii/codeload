@@ -19,9 +19,9 @@ func ExecuteCmdHere(command string) ([]byte, bool) {
 	} else {
 		cmd = exec.Command(realCmd)
 	}
-	result, err := cmd.Output()
+	result, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Printf("CmdRunError(cmd=%s, agrs=%v): %s", realCmd, args, err)
+		log.Panicln(string(result))
 		return nil, false
 	}
 	return result, true
