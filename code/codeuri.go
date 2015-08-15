@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -23,6 +24,37 @@ func NewCodeURI(user, repo, branch string) *CodeURI {
 		Repo:   repo,
 		Branch: branch,
 	}
+}
+
+func defaultUser() string {
+	dir, _ := os.Getwd()
+	base := filepath.Base(dir)
+	fmt.Println(base)
+	return base
+}
+
+func (c *CodeURI) Set(value string) error {
+	urb := strings.Split(value, ":")
+	ur := urb[0]
+	if len(urb) <= 1 {
+		c.Branch = "master"
+	} else {
+		c.Branch = urb[1]
+	}
+
+	urs := strings.Split(ur, "/")
+	if len(urs) <= 1 {
+		c.User = defaultUser()
+		c.Repo = ur
+	} else {
+		c.User = urs[0]
+		c.Repo = urs[1]
+	}
+	return nil
+}
+
+func (c *CodeURI) String() string {
+	return fmt.Sprintf("%s/%s:%s", c.User, c.Repo, c.Branch)
 }
 
 func GithubCodeURI(branch string) *CodeURI {
