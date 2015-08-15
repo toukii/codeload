@@ -57,6 +57,10 @@ func (c *CodeURI) String() string {
 	return fmt.Sprintf("%s/%s:%s", c.User, c.Repo, c.Branch)
 }
 
+func (c *CodeURI) GithuUserPath() string {
+	return fmt.Sprintf("%s/src/github.com/%s", os.Getenv("GOPATH"), c.User)
+}
+
 func GithubCodeURI(branch string) *CodeURI {
 	s1 := strings.Split(branch, ":")
 	if len(s1) == 1 {
@@ -87,6 +91,7 @@ func (c *CodeURI) Download() {
 }
 
 func (c *CodeURI) curl() bool {
+	os.Chdir(c.GithuUserPath())
 	uri := c.URI()
 	curl_command := fmt.Sprintf("curl %s", uri)
 	b, ok := execc.ExecuteCmdHere(curl_command)
