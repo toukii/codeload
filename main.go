@@ -2,38 +2,28 @@ package main
 
 import (
 	"fmt"
+	"github.com/everfore/codeload/code"
+	"os"
 	"strings"
 	"time"
-
-	"github.com/everfore/codeload/code"
-	// "github.com/everfore/codeload/unzip"
-	"flag"
 )
 
-var repo code.CodeURI
-
-func init() {
-	flag.Var(&repo, "c", "usage")
-}
 func main() {
-	flag.Parse()
 
 	start := time.Now()
 
-	if len(repo.String()) <= 2 {
-		var input string
-		tips := "everfore/codeload:master  > "
-		fmt.Print(tips)
-		fmt.Scanf("%s", &input)
-		if strings.Contains(input, "/") {
-			codeuri := code.GithubCodeURI(input)
-			codeuri.Download()
-			codeuri.Unzip()
-		} else {
-			codeuri := code.GithubCodeURI("/" + input)
-			codeuri.Unzip()
-		}
+	var input string
+	tips := "[everfore/]codeload[:master]  > $"
+	fmt.Print(tips)
+	fmt.Scanf("%s", &input)
+	if strings.Contains(input, "/") {
+		codeuri := code.GithubCodeURI(input)
+		os.Chdir(codeuri.GithuUserPath())
+		codeuri.Download()
+		codeuri.Unzip()
 	} else {
+		var repo code.CodeURI
+		repo.Set(input)
 		repo.Download()
 		repo.Unzip()
 	}

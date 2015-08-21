@@ -4,12 +4,14 @@ import (
 	"fmt"
 
 	"bytes"
-	"github.com/everfore/codeload/execc"
+	"github.com/everfore/exc"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"net/http"
 )
 
 type CodeURI struct {
@@ -29,7 +31,7 @@ func NewCodeURI(user, repo, branch string) *CodeURI {
 func defaultUser() string {
 	dir, _ := os.Getwd()
 	base := filepath.Base(dir)
-	fmt.Println(base)
+	fmt.Printf("default user:%s\n", base)
 	return base
 }
 
@@ -82,21 +84,41 @@ func (c *CodeURI) UnzipName() string {
 }
 
 func (c *CodeURI) Download() {
-	curled := c.curl()
+	// curled := c.curl()
+	curled := c.download()
 	if curled {
-		log.Println("curl success!")
+		log.Println("download success!")
 	} else {
-		log.Println("curl failed!")
+		log.Println("download failed!")
 	}
 }
 
-func (c *CodeURI) curl() bool {
-	os.Chdir(c.GithuUserPath())
+func (c *CodeURI) download() bool {
 	uri := c.URI()
-	curl_command := fmt.Sprintf("curl %s", uri)
-	b, ok := execc.ExecuteCmdHere(curl_command)
-	if ok {
+	resp, err := http.Get(uri)
+	fmt.Printf("downloading...  %s\n", uri)
+	if checkerr(err) {
+		return false
+	}
+	f, err := os.OpenFile(fmt.Sprintf("%s.zip", c.Branch), os.O_WRONLY|os.O_CREATE, 0644)
+	defer f.Close()
+	if checkerr(err) {
+		return false
+	}
+	_, err = io.Copy(f, resp.Body)
+	if checkerr(err) {
+		return false
+	}
+	return true
+}
+
+func (c *CodeURI) curl() bool {
+	uri := c.URI()
+	curl_command := fmt.Sprintf("curl %s\n", uri)
+	b, err := exc.NewCMD(curl_command).Do()
+	if !exc.Checkerr(err) {
 		f, err := os.OpenFile(fmt.Sprintf("%s.zip", c.Branch), os.O_WRONLY|os.O_CREATE, 0644)
+		defer f.Close()
 		if checkerr(err) {
 			return false
 		}
@@ -111,14 +133,20 @@ func (c *CodeURI) curl() bool {
 
 func (c *CodeURI) Unzip() bool {
 	unzip_command := fmt.Sprintf("unzip %s.zip", c.Branch)
-	_, ok := execc.ExecuteCmdHere(unzip_command)
-	if ok {
+	cmd := exc.NewCMD(unzip_command)
+	_, err := cmd.Debug().Do()
+	if !exc.Checkerr(err) {
 		rename_command := fmt.Sprintf("mv %s %s", c.UnzipName(), c.Repo)
-		_, renamed := execc.ExecuteCmdHere(rename_command)
-		if renamed {
-			del_command := fmt.Sprintf("rm -rf %s.zip", c.Branch)
-			_, deled := execc.ExecuteCmdHere(del_command)
-			if !deled {
+		_, err = os.Stat(c.Repo)
+		if nil == err {
+			err = os.RemoveAll(c.Repo)
+			checkerr(err)
+		}
+		_, renamed := cmd.Reset(rename_command).Do()
+		if !exc.Checkerr(renamed) {
+			zipfile := fmt.Sprintf("%s.zip", c.Branch)
+			removed := os.Remove(zipfile)
+			if !checkerr(removed) {
 				return false
 			}
 			return true

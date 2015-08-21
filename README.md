@@ -18,7 +18,14 @@ go get github.com/everfore/codeload
 
 >user/repo
 
+	or
+
+>codeload
+
+>repo    with default by @filepath.Base(dir)
+
 if branch is nil, use master as default branch.
+if user is nil, use filepath.Base as default user.
 
 ##	license
 
