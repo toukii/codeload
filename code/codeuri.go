@@ -45,7 +45,7 @@ func (c *CodeURI) Set(value string) error {
 	}
 
 	urs := strings.Split(ur, "/")
-	if len(urs) <= 1 {
+	if !strings.Contains(ur, "/") {
 		c.User = defaultUser()
 		c.Repo = ur
 	} else {
