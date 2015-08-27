@@ -60,7 +60,15 @@ func (c *CodeURI) String() string {
 }
 
 func (c *CodeURI) GithuUserPath() string {
-	return fmt.Sprintf("%s/src/github.com/%s", os.Getenv("GOPATH"), c.User)
+	path := filepath.Join(os.Getenv("GOPATH"), "src", "github.com", c.User)
+	_, err := os.Stat(path)
+	if err != nil {
+		err = os.MkdirAll(path, 0777)
+		if checkerr(err) {
+			return path
+		}
+	}
+	return path
 }
 
 func GithubCodeURI(branch string) *CodeURI {
