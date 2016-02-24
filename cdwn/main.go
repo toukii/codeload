@@ -1,8 +1,10 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/everfore/codeload/unzip"
+	"github.com/everfore/exc"
 	"github.com/shaalx/goutils"
 	"net/http"
 	"os"
@@ -11,8 +13,16 @@ import (
 	"time"
 )
 
-func main() {
+var (
+	install = false
+)
 
+func init() {
+	flag.BoolVar(&install, "i", false, "-i [true] : go install")
+}
+
+func main() {
+	flag.Parse()
 	var input, user, repo, branch, input_1, target string
 	tips := "[user/]repo[:branch]  > $"
 	fmt.Print(tips)
@@ -50,5 +60,11 @@ func main() {
 	GOPATH := os.Getenv("GOPATH")
 	target = filepath.Join(GOPATH, "src", "github.com", user, repo)
 	unzip.UnzipReader(resp.Body, target)
+
+	// os.MkdirAll(target, 0777)
+	cmd := exc.NewCMD(codeload_uri).Env("GOPATH").Cd("src/github.com/").Cd(user).Wd().Debug().Execute()
+	if install {
+		cmd.Cd(repo).Wd().Reset("go install").Execute()
+	}
 	fmt.Printf("cost time:%v\n", time.Now().Sub(start))
 }

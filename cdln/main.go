@@ -54,6 +54,9 @@ func main() {
 	} else {
 		codeload_uri = fmt.Sprintf("git clone --depth 1 git://github.com/%s/%s", user, repo)
 	}
+	GOPATH := os.Getenv("GOPATH")
+	target := filepath.Join(GOPATH, "src", "github.com", user, repo)
+	os.MkdirAll(target, 0777)
 	cmd := exc.NewCMD(codeload_uri).Env("GOPATH").Cd("src/github.com/").Cd(user).Wd().Debug().Execute()
 	if install {
 		cmd.Cd(repo).Wd().Reset("go install").Execute()
