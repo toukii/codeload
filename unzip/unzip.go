@@ -18,10 +18,11 @@ func UnzipReader(r io.Reader, target string) {
 	if checkerr(err) || n <= 0 {
 		return
 	}
-	of, err := os.OpenFile("github.zip", os.O_CREATE|os.O_WRONLY, 0666)
-	defer of.Close()
+	of, err := os.OpenFile("github.zip", os.O_CREATE|os.O_WRONLY, 0777)
 	defer func() {
-		os.Remove("github.zip")
+		of.Close()
+		err := os.Remove("github.zip")
+		checkerr(err)
 	}()
 	if checkerr(err) {
 		return
