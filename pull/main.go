@@ -12,12 +12,12 @@ import (
 )
 
 var (
-	write   = false
+	read    = false // default writeable
 	install = false
 )
 
 func init() {
-	flag.BoolVar(&write, "w", false, "-b [true] : git@github.com or git://github.com")
+	flag.BoolVar(&read, "r", false, "-r [true] : git@github.com[false] or git://github.com[true]")
 	flag.BoolVar(&install, "i", false, "-i [true] : go install")
 }
 
@@ -25,6 +25,7 @@ func main() {
 	flag.Parse()
 	var input, user, repo, branch, input_1 /*,target*/ string
 	tips := "[user/]repo[:branch]  > $"
+
 	fmt.Print(tips)
 	fmt.Scanf("%s", &input)
 
@@ -33,6 +34,9 @@ func main() {
 		inputs := strings.Split(input, "/")
 		user = inputs[0]
 		input_1 = inputs[1]
+	} else if len(input) <= 0 {
+		exc.NewCMD("git pull").Debug().Execute()
+		return
 	} else {
 		pwd, _ := os.Getwd()
 		user = filepath.Base(pwd)
@@ -49,7 +53,7 @@ func main() {
 	}
 	fmt.Printf("%s/%s:%s\n", user, repo, branch)
 	codeload_uri := ""
-	if write {
+	if !read {
 		codeload_uri = fmt.Sprintf("git clone --depth 1 git@github.com:%s/%s.git", user, repo)
 	} else {
 		codeload_uri = fmt.Sprintf("git clone --depth 1 git://github.com/%s/%s", user, repo)
