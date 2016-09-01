@@ -1,7 +1,7 @@
 package unzip
 
 import (
-	"github.com/shaalx/goutils"
+	"github.com/toukii/goutils"
 	"testing"
 
 	"os"

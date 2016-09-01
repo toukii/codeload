@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/everfore/codeload/unzip"
 	"github.com/everfore/exc"
-	"github.com/shaalx/goutils"
+	"github.com/toukii/goutils"
 	"net/http"
 	"os"
 	"path/filepath"
