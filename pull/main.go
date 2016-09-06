@@ -54,9 +54,9 @@ func main() {
 	fmt.Printf("%s/%s:%s\n", user, repo, branch)
 	codeload_uri := ""
 	if !read {
-		codeload_uri = fmt.Sprintf("git clone --depth 1 git@github.com:%s/%s.git", user, repo)
+		codeload_uri = fmt.Sprintf("git clone --progress --depth 1 git@github.com:%s/%s.git", user, repo)
 	} else {
-		codeload_uri = fmt.Sprintf("git clone --depth 1 git://github.com/%s/%s", user, repo)
+		codeload_uri = fmt.Sprintf("git clone --progress --depth 1 git://github.com/%s/%s", user, repo)
 	}
 	GOPATH := os.Getenv("GOPATH")
 	target := filepath.Join(GOPATH, "src", "github.com", user, repo)
