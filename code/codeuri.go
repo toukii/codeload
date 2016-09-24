@@ -122,7 +122,7 @@ func (c *CodeURI) download() bool {
 
 func (c *CodeURI) curl() bool {
 	uri := c.URI()
-	curl_command := fmt.Sprintf("curl %s\n", uri)
+	curl_command := fmt.Sprintf("curl -0 %s\n", uri)
 	b, err := exc.NewCMD(curl_command).Do()
 	if !exc.Checkerr(err) {
 		f, err := os.OpenFile(fmt.Sprintf("%s.zip", c.Branch), os.O_WRONLY|os.O_CREATE, 0644)

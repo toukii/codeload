@@ -20,11 +20,11 @@ func TestUnzipReader1(t *testing.T) {
 }
 
 func TestUnzipReader2(t *testing.T) {
-	resp, err := http.Get("https://codeload.github.com/shaalx/tools/zip/env")
+	resp, err := http.Get("https://codeload.github.com/toukii/tools/zip/env")
 	if goutils.CheckErr(err) {
 		return
 	}
 	gopath := os.Getenv("GOPATH")
-	target := filepath.Join(gopath, "src", "github.com", "shaalx", "tools")
+	target := filepath.Join(gopath, "src", "github.com", "toukii", "tools")
 	UnzipReader(resp.Body, target)
 }
